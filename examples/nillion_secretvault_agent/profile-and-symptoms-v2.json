@@ -1,0 +1,81 @@
+{
+  "INTAKE": {
+    "Demographics": {
+      "Name": "Marcus J. Holloway",
+      "Age": 38,
+      "Sex": "Male",
+      "Ethnicity": "Caucasian",
+      "Occupation": "Agricultural Equipment Sales",
+      "Location": "Rural Nebraska",
+      "MaritalStatus": "Married",
+      "Children": 2,
+      "Insurance": "MidwestFarmersCoop_HealthPlan"
+    },
+    "Vitals": {
+      "Height": "5'11",
+      "Weight": "187 lbs",
+      "BMI": 26.1,
+      "BP": "138/86 mmHg",
+      "HR": "88 bpm (resting)",
+      "Temp": "98.9°F (oral)",
+      "SpO2": "97% RA",
+      "RespRate": "16/min"
+    },
+    "ChiefComplaints": [
+      "Recurrent low-grade fever (3 months)",
+      "Persistent non-productive cough",
+      "Fatigue requiring midday naps despite adequate sleep",
+      "Migratory joint stiffness (wrists/knees/ankles)",
+      "Unexplained 12 lb weight loss over 4 months",
+      "Intermittent 'bullseye-shaped' rash recurrence (thigh/axilla)",
+      "New-onset light sensitivity (photophobia)"
+    ]
+  },
+  "CHART": {
+    "ClinicalTimeline": {
+      "2023-09-15": {
+        "VisitType": "UrgentCare",
+        "Notes": "Complaint of fever (101.2°F) & dry cough. Dx: Suspected viral URI. CBC: WBC 11.2k/μL (H), lymphs 18% (L). Rapid flu/COVID-19 neg. Rx: Hydration, NSAIDs."
+      },
+      "2023-10-03": {
+        "VisitType": "PCP Follow-Up",
+        "Notes": "Persistent fatigue. Normal CMP except ALT 68 U/L (H). CRP 12 mg/L (H). Chest XR: Clear. Dx: Post-viral syndrome. Rx: Rest."
+      },
+      "2023-11-17": {
+        "VisitType": "Rheumatology Consult",
+        "Notes": "Migratory arthralgia. RF <20 IU/mL, ANA 1:80 speckled. Uric acid 5.1 mg/dL. Dx: Undifferentiated connective tissue disorder? Trial prednisone 10mg - minimal improvement."
+      },
+      "2024-01-08": {
+        "VisitType": "Dermatology",
+        "Notes": "Reported annular erythema (photo reviewed). No active rash present. Punch biopsy (site healed): Non-specific dermal inflammation. Direct immunofluorescence neg."
+      },
+      "2024-02-14": {
+        "VisitType": "Cardiology",
+        "Notes": "Palpitations. Echo: EF 60%, mild pericardial effusion. Holter: Occasional PVCs. Troponin <0.01 ng/mL. Advised reduce caffeine."
+      },
+      "2024-03-22": {
+        "VisitType": "Neurology",
+        "Notes": "Complaint of facial twitching. Normal brain MRI. Lyme AB (ELISA): Positive IgG/IgM. Western Blot: 5/10 IgG bands, 2/3 IgM. CDC criteria not met. LP pending."
+      },
+      "2024-03-29": {
+        "VisitType": "Lab Results",
+        "Notes": "CSF analysis: WBC 22/μL (90% lymphs), protein 55 mg/dL. CSF IgG index elevated. Borrelia PCR: Pending."
+      }
+    },
+    "Medications": [
+      "Ibuprofen 600mg PRN",
+      "Loratadine 10mg daily",
+      "Omeprazole 20mg daily",
+      "Trial: Doxycycline 100mg BID (started 2024-03-25)"
+    ],
+    "Allergies": "Sulfa drugs (rash)",
+    "SocialHx": {
+      "Tobacco": "None",
+      "Alcohol": "2-4 beers/week",
+      "RecreationalDrugs": "Denies",
+      "AnimalExposure": "Farm dogs (ticks noted in home)",
+      "Travel": "Camping in Wisconsin 2023-08"
+    }
+  },
+  "CAUSE": "Lyme disease"
+}

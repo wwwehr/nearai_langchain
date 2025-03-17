@@ -1,0 +1,66 @@
+{
+  "INTAKE": {
+    "Demographics": {
+      "Name": "Barbara Miller",
+      "Date of Birth": "1965-05-12",
+      "Gender": "Female",
+      "Address": "123 Main Street, Anytown, USA",
+      "Ethnicity": "Caucasian",
+      "Occupation": "Accountant, Midwestern Bank"
+    },
+    "Chief Complaints": [
+      "General fatigue/low energy for the past 6 months",
+      "Pain in the lower abdomen for the past 2 days",
+      "Unexplained weight loss of 10 pounds over the past 6 months",
+      "Occasional light bleeding during menses"
+    ],
+    "History of Present Illness": "For the past six months, Ms. Miller has been experiencing general fatigue and a lack of energy. She reports that this has been getting progressively worse lately. She has also been unable to perform her usual necessary tasks, including going to the grocery store without feeling drained. Recently, she experienced sudden onset abdominal pain, and experienced this pain more intensely on a cold day just yesterday. She reports the sugar in her pee is high and says it makes her go to the bathroom frequently."
+  },
+  "CHART": {
+    "Vitals": {
+      "Temperature": "98.6 F",
+      "Heart Rate": "72 bpm",
+      "Respiratory Rate": "16 bpm",
+      "Blood Pressure": "120/80 mmHg",
+      "Weight": "165 lb",
+      "BMI": "28.2",
+      "Height": "5'6"
+    },
+    "Physical Examination": {
+      "General Appearance": "Well-hydrated/well-nourished appearance",
+      "HEENT": "Normocephalic. No ENT abnormalities.",
+      "Cardio": "S3 systolic. Mildly elevated RDP. No murmurs or rubs.",
+      "GI": "Soft abdominal tenderness in epigastric region. Bowel sounds normal.",
+      "Musculoskeletal": "No obvious joint pain or stiffness.",
+      "Neuro": "Alert and oriented. Neurological examination unremarkable."
+    },
+    "Lab Work": [
+      {
+        "Test": "Complete Blood Count",
+        "Results": "Some leukocytosis with subclinical neutrophilic and lymphocytosis =found"
+      },
+      {
+        "Test": "Serum Amylase",
+        "Results": "Elevated = found"
+      },
+      {
+        "Test": "Ferritin",
+        "Results": "Low = found"
+      },
+      { "Test": "Lipid Panel", "Results": "High cholesterol = found" }
+    ],
+    "Procedures": [
+      {
+        "Test": "EKG",
+        "Result": "Prior to this visit, EKG was normal."
+      }
+    ],
+    "Radiology": [
+      {
+        "Test": "腹部超声",
+        "Results": "No obvious ascending or descending abdominal vascular abnormalities. No hydronephrosis or free fluid in abdominal cavity. Diffuse splenomegaly. No perihepatic abscessation detected. A small amount of bright red blood in the right renal pelvis."
+      }
+    ]
+  },
+  "CAUSE": "Atypical Tuberculosis"
+}
