@@ -4,7 +4,6 @@
 
 import json
 import os
-import sys
 
 from coinbase_agentkit import (  # type: ignore
     AgentKit,
@@ -46,18 +45,11 @@ def initialize_agent():
         with open(wallet_data_file) as f:
             wallet_data = f.read()
 
-    cdp_config = CdpWalletProviderConfig(network_id=os.environ["NETWORK_ID"])
+    cdp_config = None
     if wallet_data is not None:
-        cdp_config = CdpWalletProviderConfig(
-            network_id=os.environ["NETWORK_ID"], wallet_data=wallet_data
-        )
+        cdp_config = CdpWalletProviderConfig(wallet_data=wallet_data)
 
     wallet_provider = CdpWalletProvider(cdp_config)
-
-    print(wallet_provider.get_address())
-    print(wallet_provider.get_network())
-    print(wallet_provider.get_balance())
-    print(wallet_provider.get_name())
 
     agentkit = AgentKit(
         AgentKitConfig(
@@ -107,29 +99,67 @@ executor = initialize_agent()
 # In local mode an agent is responsible to get and upload user messages.
 env = orchestrator.env
 
-print("Starting chat mode... Type 'exit' to end.")
-while True:
-    try:
-        if orchestrator.run_mode == RunMode.LOCAL:
-            user_input = input("\nPrompt: ")
-            if user_input.lower() == "exit":
-                break
-            env.add_user_message(user_input)
+if orchestrator.run_mode == RunMode.LOCAL:
+    print("Entering autonomous mode...")
 
-        messages = env.list_messages()
-        for chunk in executor.stream({"messages": messages}):
-            if "agent" in chunk:
-                result = chunk["agent"]["messages"][0].content
-            elif "tools" in chunk:
-                result = chunk["tools"]["messages"][0].content
-            env.add_reply(result)
+    risk_profiles = {
+        "Conservative Trader": """
+            Account Risk Tolerance: 1-2%
+            Preferred Risk Categories: Very Low to Low
+            Position Sizing: 5-15% max per asset
+            Stop Loss Strategy: Wider (8-10%)
+            Take Profit: 15-20%
+            Time Horizon: Medium to Long-term
+        """,
+        "Balanced Trader": """
+            Account Risk Tolerance: 2-5%
+            Preferred Risk Categories: Low to Moderate
+            Position Sizing: 10-20% max per asset
+            Stop Loss Strategy: Standard (6-8%)
+            Take Profit: 20-30%
+            Time Horizon: Medium-term
+        """,
+        "Aggressive Trader": """
+            Account Risk Tolerance: 5-10%
+            Preferred Risk Categories: Moderate to High
+            Position Sizing: 15-25% max per asset
+            Stop Loss Strategy: Tighter (4-6%)
+            Take Profit: 25-40%
+            Time Horizon: Short to Medium-term
+        """,
+        "Day Trader": """
+            Account Risk Tolerance: 3-7%
+            Preferred Risk Categories: Any (adjusts position size accordingly)
+            Position Sizing: Varies by volatility (5-30%)
+            Stop Loss Strategy: Very tight (2-4%)
+            Take Profit: 10-15%
+            Time Horizon: Intraday to 48 hours
+        """,
+    }
 
-            if orchestrator.run_mode == RunMode.LOCAL:
-                print(result)
-                print("-------------------")
+    TASK = """
+    Create an entry in the SecretVault that defines my risk trading strategy.
 
-        # Run once per user message.
-        env.mark_done()
-    except KeyboardInterrupt:
-        print("Goodbye Agent!")
-        sys.exit(0)
+    First, look up the schema `My Crypto Trader Risk Profile` and consider the fields.
+
+    Then, create a single entry that considers my trading style:
+    {risk_profiles['Aggressive Trader']}
+    """
+
+    env.add_user_message(TASK)
+
+
+messages = env.list_messages()
+for chunk in executor.stream({"messages": messages}):
+    if "agent" in chunk:
+        result = chunk["agent"]["messages"][0].content
+    elif "tools" in chunk:
+        result = chunk["tools"]["messages"][0].content
+    env.add_reply(result)
+
+    if orchestrator.run_mode == RunMode.LOCAL:
+        print(result)
+        print("-------------------")
+
+# Run once per user message.
+env.mark_done()

@@ -1,0 +1,37 @@
+# Crypto Risk Profile Report - 2025-03-19
+
+## Market Overview
+- **Overall Sentiment**: 0.75 (Bullish)
+- **Total Articles**: 287 (216 positive, 66 neutral, 5 negative)
+- **Market Risk Level**: Lower
+
+## Asset Risk Profiles
+
+| Asset | Risk Score | Category | Max Position | Stop Loss | Take Profit | News Sentiment | Attention |
+|-------|------------|----------|--------------|-----------|-------------|----------------|-----------|
+| UNI | 25.44 | Low | 20% | 8% | 24% | 0.86 | 2.88% |
+| BNB | 28.15 | Low | 20% | 8% | 24% | 0.78 | 3.7% |
+| DOGE | 29.48 | Low | 20% | 8% | 24% | 0.75 | 4.94% |
+| SOL | 31.77 | Low | 20% | 8% | 24% | 0.79 | 13.99% |
+| ADA | 32.57 | Low | 20% | 8% | 24% | 0.62 | 3.29% |
+| ETH | 33.63 | Low | 20% | 8% | 24% | 0.82 | 20.58% |
+| XRP | 34.77 | Low | 20% | 8% | 24% | 0.74 | 17.28% |
+| BTC | 37.91 | Low | 20% | 8% | 24% | 0.74 | 25.1% |
+
+## Risk Adjustment Guidelines
+
+1. **High Attention Assets** (BTC, ETH, XRP)
+   - Consider lower time frames for entries
+   - Reduce position sizes by additional 5% during high volatility
+
+4. **Low Risk Assets** (All others)
+   - Standard position management with 8% stops
+   - Consider longer holding periods
+   - Target 24% profit taking
+
+## Implementation Notes
+
+- Current market shows high positive sentiment (75%)
+- 5 negative articles detected, suggesting caution
+- Higher attention assets (BTC, ETH, XRP) carry slightly higher risk despite positive sentiment
+- Consider programmatic circuit breakers if sentiment drops below 0.60

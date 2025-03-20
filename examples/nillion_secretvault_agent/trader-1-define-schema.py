@@ -4,7 +4,6 @@
 
 import json
 import os
-import sys
 
 from coinbase_agentkit import (  # type: ignore
     AgentKit,
@@ -46,18 +45,11 @@ def initialize_agent():
         with open(wallet_data_file) as f:
             wallet_data = f.read()
 
-    cdp_config = CdpWalletProviderConfig(network_id=os.environ["NETWORK_ID"])
+    cdp_config = None
     if wallet_data is not None:
-        cdp_config = CdpWalletProviderConfig(
-            network_id=os.environ["NETWORK_ID"], wallet_data=wallet_data
-        )
+        cdp_config = CdpWalletProviderConfig(wallet_data=wallet_data)
 
     wallet_provider = CdpWalletProvider(cdp_config)
-
-    print(wallet_provider.get_address())
-    print(wallet_provider.get_network())
-    print(wallet_provider.get_balance())
-    print(wallet_provider.get_name())
 
     agentkit = AgentKit(
         AgentKitConfig(
@@ -107,29 +99,78 @@ executor = initialize_agent()
 # In local mode an agent is responsible to get and upload user messages.
 env = orchestrator.env
 
-print("Starting chat mode... Type 'exit' to end.")
-while True:
-    try:
-        if orchestrator.run_mode == RunMode.LOCAL:
-            user_input = input("\nPrompt: ")
-            if user_input.lower() == "exit":
-                break
-            env.add_user_message(user_input)
+if orchestrator.run_mode == RunMode.LOCAL:
+    print("Entering chat mode...")
+    TASK = """
+    Create a basic schema in the SecretVault so that I can track my crypto trading risk strategy.
 
-        messages = env.list_messages()
-        for chunk in executor.stream({"messages": messages}):
-            if "agent" in chunk:
-                result = chunk["agent"]["messages"][0].content
-            elif "tools" in chunk:
-                result = chunk["tools"]["messages"][0].content
-            env.add_reply(result)
+    Field: Account Risk Tolerance All Positions
+    Definition: The maximum percentage of your total trading capital you're willing to risk across all open positions.
+    Example: 2
+    Comment: Limits your total exposure to prevent catastrophic losses.
 
-            if orchestrator.run_mode == RunMode.LOCAL:
-                print(result)
-                print("-------------------")
+    Name: Max Position Size Low
+    Definition: Maximum percentage of your portfolio to allocate to a specific asset.
+    Example: 20
+    Application: Controls concentration risk in any single cryptocurrency.
 
-        # Run once per user message.
-        env.mark_done()
-    except KeyboardInterrupt:
-        print("Goodbye Agent!")
-        sys.exit(0)
+    Name: Stop Loss Percentage Low
+    Definition: Price level below entry where you exit to limit losses.
+    Example: 8
+    Application: Automatic risk control mechanism that caps loss on any trade.
+
+    Name: Take Profit Percentage Low
+    Definition: Price level above entry where you exit to secure gains.
+    Example: 24
+    Application: Systematic profit-taking strategy based on risk category.
+
+    Name: Max Position Size Moderate
+    Definition: Maximum percentage of your portfolio to allocate to a specific asset.
+    Example: 15
+    Application: Controls concentration risk in any single cryptocurrency.
+
+    Name: Stop Loss Percentage Moderate
+    Definition: Price level below entry where you exit to limit losses.
+    Example: 6
+    Application: Automatic risk control mechanism that caps loss on any trade.
+
+    Name: Take Profit Percentage Moderate
+    Definition: Price level above entry where you exit to secure gains.
+    Example: 18
+    Application: Systematic profit-taking strategy based on risk category.
+
+    Name: Max Position Size High
+    Definition: Maximum percentage of your portfolio to allocate to a specific asset.
+    Example: 5
+    Application: Controls concentration risk in any single cryptocurrency.
+
+    Name: Stop Loss Percentage High
+    Definition: Price level below entry where you exit to limit losses.
+    Example: 2
+    Application: Automatic risk control mechanism that caps loss on any trade.
+
+    Name: Take Profit Percentage High
+    Definition: Price level above entry where you exit to secure gains.
+    Example: 10
+    Application: Systematic profit-taking strategy based on risk category.
+
+    All of these fields should be secret. Call the schema `My Crypto Trader Risk Profile`
+    """
+
+    env.add_user_message(TASK)
+
+
+messages = env.list_messages()
+for chunk in executor.stream({"messages": messages}):
+    if "agent" in chunk:
+        result = chunk["agent"]["messages"][0].content
+    elif "tools" in chunk:
+        result = chunk["tools"]["messages"][0].content
+    env.add_reply(result)
+
+    if orchestrator.run_mode == RunMode.LOCAL:
+        print(result)
+        print("-------------------")
+
+# Run once per user message.
+env.mark_done()
