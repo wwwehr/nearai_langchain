@@ -2,6 +2,7 @@
 # https://github.com/coinbase/agentkit/blob/main/python/examples/langchain-cdp-chatbot/chatbot.py
 # that adds nearai integration: inference, environment, and threads.
 
+
 import json
 import os
 import sys
@@ -13,7 +14,6 @@ from coinbase_agentkit import (  # type: ignore
     CdpWalletProviderConfig,
     cdp_api_action_provider,
     cdp_wallet_action_provider,
-    erc20_action_provider,
     nillion_action_provider,
     pyth_action_provider,
     wallet_action_provider,
@@ -54,18 +54,12 @@ def initialize_agent():
 
     wallet_provider = CdpWalletProvider(cdp_config)
 
-    print(wallet_provider.get_address())
-    print(wallet_provider.get_network())
-    print(wallet_provider.get_balance())
-    print(wallet_provider.get_name())
-
     agentkit = AgentKit(
         AgentKitConfig(
             wallet_provider=wallet_provider,
             action_providers=[
                 cdp_api_action_provider(),
                 cdp_wallet_action_provider(),
-                erc20_action_provider(),
                 nillion_action_provider(),
                 pyth_action_provider(),
                 wallet_action_provider(),
@@ -107,29 +101,98 @@ executor = initialize_agent()
 # In local mode an agent is responsible to get and upload user messages.
 env = orchestrator.env
 
-print("Starting chat mode... Type 'exit' to end.")
-while True:
-    try:
-        if orchestrator.run_mode == RunMode.LOCAL:
-            user_input = input("\nPrompt: ")
-            if user_input.lower() == "exit":
-                break
-            env.add_user_message(user_input)
+if orchestrator.run_mode == RunMode.LOCAL:
+    print("Entering autonomous mode...")
 
-        messages = env.list_messages()
-        for chunk in executor.stream({"messages": messages}):
-            if "agent" in chunk:
-                result = chunk["agent"]["messages"][0].content
-            elif "tools" in chunk:
-                result = chunk["tools"]["messages"][0].content
-            env.add_reply(result)
+    with open("supported-tokens.json", "r", encoding="utf-8") as f:
+        supported_tokens = json.load(f)
 
-            if orchestrator.run_mode == RunMode.LOCAL:
-                print(result)
-                print("-------------------")
+    with open(sys.argv[1], "r", encoding="utf-8") as f:
+        report1 = f.read()
 
-        # Run once per user message.
-        env.mark_done()
-    except KeyboardInterrupt:
-        print("Goodbye Agent!")
-        sys.exit(0)
+    with open(sys.argv[2], "r", encoding="utf-8") as f:
+        report2 = f.read()
+
+    TASK = f"""
+    ## Your task:
+    Perform zero or more swaps based on my risk profile and the prepared market analysis report.
+
+    1. fetch my data in the `My Crypto Trader Risk Profile` schema and consider
+    my settings. You should look up the schema based on the name.
+
+    2. look up my wallet details and all held assets
+
+    3. considering my assets and capital, recommend three (3) most impactful trades
+
+    4. decide on smart risk trading strategy derived from trends discovered among the
+       two reports and select the corresponding trading rules from my profile
+
+    5. instead of looking up prices, just swap
+
+    6. perform the swaps on cdp that you ultimately find most excellent and aligned
+       with my risk profile without asking, but show me all the transaction ids
+
+    7. tell me what actions are are performing before you perform them, summarize the
+       result of each action
+
+    IMPORTANT:
+    - Do not recommend generic token names, types or descriptors. You must recommend
+      explicit crypto ticker symbols by name only combined with amount, like "BTC|0.000020"
+      or "XRP|0.10" or "ETH|0.002"
+    - Use entire wallet funds as my working capital, but obey all the risk profile rules
+    - Embrace the trader risk profile fully, but avoid small trade amounts where gas fees would
+      cost more than the asset
+    - Never swap a token to the same token
+    - Only consider tokens that exist in the `Supported Tokens` list. Do not even concern
+      yourself with other assets.
+    - All held assets are subject to swap
+    - Avoid WETH
+
+    Here are the market reports to base your recommendation on:
+
+    ## Report 1:
+    {report1}
+
+    ----
+    ## Report 2:
+    {report2}
+
+    ----
+
+    ## Supported Tokens:
+    {supported_tokens}
+    """
+
+    env.add_user_message(TASK)
+
+
+messages = env.list_messages()
+for chunk in executor.stream({"messages": messages}, {"recursion_limit": 1000}):
+    if "agent" in chunk:
+        result = chunk["agent"]["messages"][0].content
+    elif "tools" in chunk:
+        result = chunk["tools"]["messages"][0].content
+    env.add_reply(result)
+
+    if orchestrator.run_mode == RunMode.LOCAL:
+        print(result)
+        print("-------------------")
+
+# Run once per user message.
+env.mark_done()
+
+env.add_user_message("complete any outstanding tasks")
+messages = env.list_messages()
+for chunk in executor.stream({"messages": messages}, {"recursion_limit": 1000}):
+    if "agent" in chunk:
+        result = chunk["agent"]["messages"][0].content
+    elif "tools" in chunk:
+        result = chunk["tools"]["messages"][0].content
+    env.add_reply(result)
+
+    if orchestrator.run_mode == RunMode.LOCAL:
+        print(result)
+        print("-------------------")
+
+# Run once per user message.
+env.mark_done()

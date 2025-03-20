@@ -4,7 +4,6 @@
 
 import json
 import os
-import sys
 
 from coinbase_agentkit import (  # type: ignore
     AgentKit,
@@ -37,6 +36,7 @@ orchestrator = NearAILangchainOrchestrator(globals())
 
 def initialize_agent():
     """Initialize the agent with CDP Agentkit."""
+    print(f"init agent on {os.environ['NETWORK_ID']}")
     # Get ChatOpenAI model.
     llm = orchestrator.chat_model.chat_open_ai_model
 
@@ -53,12 +53,6 @@ def initialize_agent():
         )
 
     wallet_provider = CdpWalletProvider(cdp_config)
-
-    print(wallet_provider.get_address())
-    print(wallet_provider.get_network())
-    print(wallet_provider.get_balance())
-    print(wallet_provider.get_name())
-
     agentkit = AgentKit(
         AgentKitConfig(
             wallet_provider=wallet_provider,
@@ -107,29 +101,27 @@ executor = initialize_agent()
 # In local mode an agent is responsible to get and upload user messages.
 env = orchestrator.env
 
-print("Starting chat mode... Type 'exit' to end.")
-while True:
-    try:
-        if orchestrator.run_mode == RunMode.LOCAL:
-            user_input = input("\nPrompt: ")
-            if user_input.lower() == "exit":
-                break
-            env.add_user_message(user_input)
+if orchestrator.run_mode == RunMode.LOCAL:
+    print(f"Entering autonomous mode... {os.environ['NETWORK_ID']}")
 
-        messages = env.list_messages()
-        for chunk in executor.stream({"messages": messages}):
-            if "agent" in chunk:
-                result = chunk["agent"]["messages"][0].content
-            elif "tools" in chunk:
-                result = chunk["tools"]["messages"][0].content
-            env.add_reply(result)
+    TASK = """
+    1. look up my wallet details
+    """
 
-            if orchestrator.run_mode == RunMode.LOCAL:
-                print(result)
-                print("-------------------")
+    env.add_user_message(TASK)
 
-        # Run once per user message.
-        env.mark_done()
-    except KeyboardInterrupt:
-        print("Goodbye Agent!")
-        sys.exit(0)
+
+messages = env.list_messages()
+for chunk in executor.stream({"messages": messages}):
+    if "agent" in chunk:
+        result = chunk["agent"]["messages"][0].content
+    elif "tools" in chunk:
+        result = chunk["tools"]["messages"][0].content
+    env.add_reply(result)
+
+    if orchestrator.run_mode == RunMode.LOCAL:
+        print(result)
+        print("-------------------")
+
+# Run once per user message.
+env.mark_done()
