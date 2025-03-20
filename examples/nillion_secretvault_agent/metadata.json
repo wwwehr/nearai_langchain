@@ -1,5 +1,5 @@
 {
-  "name": "cdp_langchain_chatbot_with_nillion_tools",
+  "name": "cdp_langchain_chatbot_with_nillion_secretvault",
   "version": "0.0.1",
   "description": "Coinbase agentkit chatbot example using Nillion SecretVault",
   "category": "agent",
