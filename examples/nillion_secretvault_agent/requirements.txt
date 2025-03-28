@@ -1,0 +1,2 @@
+git+https://github.com/wwwehr/agentkit.git@nillion-secretvault-2#subdirectory=python/coinbase-agentkit
+waterbear==2.6.8

@@ -1,10 +1,13 @@
 # This is a somewhat simplified version of
 # https://github.com/coinbase/agentkit/blob/main/python/examples/langchain-cdp-chatbot/chatbot.py
 # that adds nearai integration: inference, environment, and threads.
-
+try:
+    import unzip_requirements
+except:
+    print("failed to load pip zip")
+    pass
 import json
 import os
-import sys
 
 from coinbase_agentkit import (  # type: ignore
     AgentKit,
@@ -24,6 +27,8 @@ from dotenv import load_dotenv
 from langgraph.prebuilt import create_react_agent
 
 from nearai_langchain.orchestrator import NearAILangchainOrchestrator, RunMode
+
+debug_mode = True
 
 # Configure a file to persist the agent's CDP MPC Wallet Data.
 wallet_data_file = "wallet_data.txt"
@@ -101,35 +106,26 @@ def initialize_agent():
 
 
 executor = initialize_agent()
-
-# NEAR AI environment.
-# In remote mode thread is assigned, user messages are given, and an agent is run at least once per user message.
-# In local mode an agent is responsible to get and upload user messages.
 env = orchestrator.env
+env.add_system_log(f"Test system log")
 
-print("Starting chat mode... Type 'exit' to end.")
-while True:
-    try:
-        if orchestrator.run_mode == RunMode.LOCAL:
-            user_input = input("\nPrompt: ")
-            if user_input.lower() == "exit":
-                break
-            env.add_user_message(user_input)
+if orchestrator.run_mode == RunMode.LOCAL:
+    print("Entering chat mode...")
+    user_input = input("\nPrompt: ")
+    env.add_user_message(user_input)
 
-        messages = env.list_messages()
-        for chunk in executor.stream({"messages": messages}):
-            if "agent" in chunk:
-                result = chunk["agent"]["messages"][0].content
-            elif "tools" in chunk:
-                result = chunk["tools"]["messages"][0].content
-            env.add_reply(result)
+messages = env.list_messages()
+for chunk in executor.stream({"messages": messages}):
+    if "agent" in chunk:
+        result = chunk["agent"]["messages"][0].content
+    elif "tools" in chunk:
+        result = chunk["tools"]["messages"][0].content
+    env.add_reply(result)
 
-            if orchestrator.run_mode == RunMode.LOCAL:
-                print(result)
-                print("-------------------")
+    if orchestrator.run_mode == RunMode.LOCAL:
+        print(result)
+        print("-------------------")
 
-        # Run once per user message.
-        env.mark_done()
-    except KeyboardInterrupt:
-        print("Goodbye Agent!")
-        sys.exit(0)
+env.request_user_input()
+
+env.mark_done()
